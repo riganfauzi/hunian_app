@@ -53,11 +53,11 @@ Desain dibuat menggunakan Figma dengan prinsip konsistensi warna, hierarki visua
 ## 📱 Tampilan Aplikasi
 
 <p align="center">
-  <img src="assets/images/login_screen.jpg" width="250">
+  <img src="assets/images/login_screen.jpg" width="150">
   &nbsp;&nbsp;
-  <img src="assets/images/home_screen.jpg" width="250">
+  <img src="assets/images/home_screen.jpg" width="150">
   &nbsp;&nbsp;
-  <img src="assets/images/detail_screen.jpg" width="250">
+  <img src="assets/images/detail_screen.jpg" width="150">
 </p>
 
 ---
