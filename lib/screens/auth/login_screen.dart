@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hunian_app/core/constants/app_colors.dart';
 import 'package:hunian_app/core/constants/app_teks_style.dart';
-import 'package:hunian_app/core/widgets/bottom_curve_clipper.dart';
-import 'package:hunian_app/core/widgets/custom_button.dart';
-import 'package:hunian_app/core/widgets/custom_text_field.dart';
+import 'package:hunian_app/core/widgets/bottom_curve_clipper_widget.dart';
+import 'package:hunian_app/core/widgets/custom_button_widget.dart';
+import 'package:hunian_app/core/widgets/custom_text_field_widget.dart';
+import 'package:provider/provider.dart';
+import 'package:hunian_app/controllers/auth_controller.dart';
+import 'package:hunian_app/services/notification_service.dart';
+import 'package:hunian_app/screens/home/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,6 +17,29 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  Future<void> _handleLogin() async {
+    if (_formKey.currentState!.validate()) {
+      final success = await context.read<AuthController>().login(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      if (success) {
+        await NotificationService().showLoginSuccessNotification();
+
+        if (!mounted) return;
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+        );
+      }
+    }
+  }
+
   bool _rememberMe = false;
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -28,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    final authController = context.watch<AuthController>();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -164,19 +192,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             ],
                           ),
                           const SizedBox(height: 50),
+                          // error message
+                          if (authController.errorMessage != null)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Text(
+                                authController.errorMessage!,
+                                style: AppTextStyles.bodySecondary.copyWith(
+                                  color: Colors.red,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
                           CustomButton(
                             text: 'Sign In',
-                            isLoading: false,
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Login berhasil (dummy)'),
-                                  ),
-                                );
-                              }
-                            },
+                            isLoading: authController.isLoading,
+                            onPressed: _handleLogin,
                           ),
+
                           const SizedBox(height: 30),
                           // Divider
                           Row(
